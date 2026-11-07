@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Study Archive | 통합 학습 자료실</title>
+<meta name="description" content="과목별 학습 콘텐츠, 인터랙티브 시뮬레이션과 학습 도구를 모아둔 통합 자료실">
+<style>
+:root{color-scheme:light;--ink:#202938;--muted:#64748b;--line:#e2e8f0;--bg:#f6f8fb;--card:#fff;--accent:#315efb}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif}
+header{padding:56px 22px 38px;background:linear-gradient(135deg,#182848,#315efb);color:white}
+.wrap{max-width:1050px;margin:auto}header .eyebrow{font-size:13px;letter-spacing:.12em;opacity:.8}h1{font-size:clamp(32px,6vw,54px);margin:12px 0}header p{max-width:650px;line-height:1.7;color:#e5eaff}
+main{max-width:1050px;margin:32px auto;padding:0 22px}.tools{display:flex;gap:10px;margin-bottom:20px}input{width:100%;padding:14px 16px;border:1px solid var(--line);border-radius:12px;font:inherit;background:white}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:15px}.card{display:block;padding:22px;background:var(--card);border:1px solid var(--line);border-radius:16px;text-decoration:none;color:inherit;transition:.18s}.card:hover{transform:translateY(-3px);border-color:#9bb0ff;box-shadow:0 10px 28px #20345a12}.icon{font-size:28px}.card h2{font-size:19px;margin:12px 0 6px}.card p{font-size:14px;line-height:1.6;color:var(--muted);margin:0}.tag{display:inline-block;margin-top:15px;color:var(--accent);font-size:12px;font-weight:650}
+footer{max-width:1050px;margin:40px auto;padding:0 22px 36px;color:var(--muted);font-size:13px}
+</style></head><body>
+<header><div class="wrap"><div class="eyebrow">OPEN LEARNING LIBRARY</div><h1>Study Archive</h1><p>과목별 학습 콘텐츠와 인터랙티브 시뮬레이션을 한곳에 모은 통합 학습 자료실입니다. 과목을 선택하거나 검색해 자료를 찾아보세요.</p></div></header>
+<main><div class="tools"><input id="search" type="search" placeholder="과목 검색하기 (예: 물리학, 영어, 화학)" aria-label="과목 검색"></div><section class="grid" id="subjects">
+<a class="card" href="./physics/"><div class="icon">⚛️</div><h2>물리학</h2><p>운동학, 역학, 열역학, 전자기학, 파동, 현대물리학과 인터랙티브 시뮬레이션</p><span class="tag">자료실 열기 →</span></a>
+<a class="card" href="./mathematics/"><div class="icon">📐</div><h2>수학</h2><p>수와 연산, 대수, 함수, 기하, 확률과 통계, 미적분 및 그래프 도구</p><span class="tag">자료실 열기 →</span></a>
+<a class="card" href="./english/"><div class="icon">🔤</div><h2>영어</h2><p>문법, 어휘, 독해, 듣기, 회화, 발음 및 인터랙티브 퀴즈</p><span class="tag">자료실 열기 →</span></a>
+<a class="card" href="./japanese/"><div class="icon">🇯🇵</div><h2>일본어</h2><p>문법, 어휘, 한자, 독해, 듣기, 회화 및 학습 퀴즈</p><span class="tag">자료실 열기 →</span></a>
+<a class="card" href="./history/"><div class="icon">🏛️</div><h2>역사</h2><p>한국사, 세계사, 일본사, 연표, 지도 및 역사 자료</p><span class="tag">자료실 열기 →</span></a>
+<a class="card" href="./chemistry/"><div class="icon">🧪</div><h2>화학</h2><p>원자와 분자, 화학 결합, 반응, 열화학, 산·염기 및 분자 시뮬레이션</p><span class="tag">자료실 열기 →</span></a>
+<a class="card" href="./biology/"><div class="icon">🧬</div><h2>생물학</h2><p>세포, 유전, 진화, 생리, 생태 및 생명과학 시각화</p><span class="tag">자료실 열기 →</span></a>
+<a class="card" href="./earth-science/"><div class="icon">🌍</div><h2>지구과학</h2><p>지질, 대기, 해양, 천문 및 지구 시스템 시각화</p><span class="tag">자료실 열기 →</span></a>
+</section></main><footer>Study Archive · 학습 및 교육 목적의 자료실</footer>
+<script>const q=document.getElementById('search');q.addEventListener('input',()=>{const v=q.value.trim().toLowerCase();document.querySelectorAll('.card').forEach(c=>c.hidden=!c.innerText.toLowerCase().includes(v));});</script>
+</body></html>
