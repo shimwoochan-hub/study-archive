@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>등가속도 직선 운동 시뮬레이션 | Study Archive</title>
+<style>
+:root{--blue:#3478f6;--green:#12a150;--ink:#202938;--muted:#697586;--line:#e4e8ef;--panel:#f5f6f8}
+*{box-sizing:border-box}body{margin:0;background:#f2f4f7;color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif;padding:22px}
+.wrap{max-width:1120px;margin:auto}.back{display:inline-block;color:#315efb;text-decoration:none;margin:4px 0 14px;font-size:14px}
+h1{font-size:clamp(23px,4vw,32px);margin:0 0 6px}.intro{color:var(--muted);margin:0 0 18px;line-height:1.6}
+.sim{display:grid;grid-template-columns:minmax(280px,.95fr) minmax(320px,1.05fr);border:1px solid #d9dee7;border-radius:22px;overflow:hidden;background:white;box-shadow:0 12px 36px #17233a0d}
+.controls{padding:28px;background:var(--panel);display:flex;flex-direction:column;gap:24px}.equation{text-align:center;font-family:Georgia,serif;font-size:clamp(23px,3vw,31px);padding:20px 4px 8px}.result{text-align:center;font-family:Georgia,serif;font-size:clamp(18px,2.5vw,25px);color:#555;line-height:1.6;min-height:82px}
+.control{display:grid;grid-template-columns:28px 1fr 52px;gap:12px;align-items:center}.control label{font-family:Georgia,serif;font-size:19px}.control output{text-align:right;font-variant-numeric:tabular-nums;color:#303846;font-size:14px}
+input[type=range]{width:100%;accent-color:var(--blue);cursor:pointer}
+.graphs{padding:18px 18px 14px;display:grid;grid-template-rows:repeat(3,minmax(145px,1fr));gap:10px}.graph{min-height:145px;border-bottom:1px solid #f0f1f4}.graph:last-child{border:0}.graph h3{text-align:center;font-size:15px;margin:2px 0 0}.graph svg{display:block;width:100%;height:calc(100% - 22px);min-height:120px;overflow:visible}
+.gridline{stroke:#e7e9ed;stroke-width:1}.axis{stroke:#555;stroke-width:2}.curve{fill:none;stroke:var(--blue);stroke-width:3.2;stroke-linecap:round}.accel{stroke:var(--green);stroke-width:3}.dot{fill:var(--blue);stroke:white;stroke-width:2}.tick{font-size:11px;fill:#858b95}
+.actions{display:flex;gap:10px;flex-wrap:wrap}.btn{border:0;border-radius:10px;padding:10px 15px;font:inherit;cursor:pointer;background:#e6ebf3;color:#273449}.btn.primary{background:var(--blue);color:white}.note{font-size:13px;color:var(--muted);line-height:1.6}
+@media(max-width:760px){body{padding:12px}.sim{grid-template-columns:1fr}.controls{padding:20px}.graphs{padding:16px;grid-template-rows:repeat(3,155px)}}
+</style>
+</head>
+<body><main class="wrap">
+<a class="back" href="../../../">← Study Archive</a>
+<h1>등가속도 직선 운동</h1><p class="intro">초기 속도와 가속도, 시간을 조절하면서 변위와 위치·속도·가속도 그래프가 어떻게 달라지는지 관찰해 보세요.</p>
+<section class="sim">
+<div class="controls">
+<div class="equation">Δx = vᵢt + ½at²</div>
+<div class="result" id="result" aria-live="polite">변위 Δx = 22.5 m</div>
+<div class="control"><label for="vi">vᵢ</label><input id="vi" type="range" min="-5" max="10" step=".5" value="2"><output id="vio">2.0 m/s</output></div>
+<div class="control"><label for="a">a</label><input id="a" type="range" min="-4" max="4" step=".1" value="1"><output id="ao">1.0 m/s²</output></div>
+<div class="control"><label for="t">t</label><input id="t" type="range" min="0" max="10" step=".5" value="5"><output id="to">5.0 s</output></div>
+<div class="actions"><button class="btn primary" id="play">시간 애니메이션 ▶</button><button class="btn" id="reset">초기화</button></div>
+<p class="note">모형은 처음 위치를 0 m로 둡니다. 변위는 Δx = vᵢt + ½at², 순간 속도는 v = vᵢ + at로 계산합니다.</p>
+</div>
+<div class="graphs">
+<div class="graph"><h3>위치 변화 x (m) · 시간 t (s)</h3><svg id="gx" viewBox="0 0 440 145" role="img" aria-label="위치 대 시간 그래프"></svg></div>
+<div class="graph"><h3>속도 v (m/s) · 시간 t (s)</h3><svg id="gv" viewBox="0 0 440 145" role="img" aria-label="속도 대 시간 그래프"></svg></div>
+<div class="graph"><h3>가속도 a (m/s²) · 시간 t (s)</h3><svg id="ga" viewBox="0 0 440 145" role="img" aria-label="가속도 대 시간 그래프"></svg></div>
+</div></section>
+</main>
+<script>
+const $=id=>document.getElementById(id), vi=$('vi'), a=$('a'), t=$('t');
+let timer=null, shown=5;
+const fmt=n=>Number(n.toFixed(2)).toString();
+function graph(id,fn,range,color='#3478f6',constant=false){
+ const svg=$(id),W=440,H=145,L=42,R=12,T=13,B=24,pw=W-L-R,ph=H-T-B, xmax=10;
+ let [mn,mx]=range;if(mx-mn<1){mn-=1;mx+=1}
+ const X=x=>L+x/xmax*pw,Y=y=>T+(mx-y)/(mx-mn)*ph;
+ let s='';
+ for(let i=0;i<=5;i++){let x=i*2,px=X(x);s+=`<line class="gridline" x1="${px}" y1="${T}" x2="${px}" y2="${H-B}"/><text class="tick" x="${px}" y="${H-7}" text-anchor="middle">${x}</text>`}
+ for(let i=0;i<=4;i++){let y=mn+(mx-mn)*i/4,py=Y(y);s+=`<line class="gridline" x1="${L}" y1="${py}" x2="${W-R}" y2="${py}"/>`}
+ const zeroY=Math.max(T,Math.min(H-B,Y(0)));
+ s+=`<line class="axis" x1="${L}" y1="${zeroY}" x2="${W-R}" y2="${zeroY}"/><line class="axis" x1="${L}" y1="${T}" x2="${L}" y2="${H-B}"/>`;
+ let d='';for(let i=0;i<=100;i++){let x=i/10,y=fn(x);d+=(i?'L':'M')+` ${X(x)} ${Y(y)} `}
+ s+=`<path d="${d}" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round"/>`;
+ let now=Math.max(0,Math.min(10,shown)),cy=Y(fn(now));s+=`<circle cx="${X(now)}" cy="${cy}" r="6.5" fill="${color}" stroke="white" stroke-width="2.5"/>`;
+ svg.innerHTML=s;
+}
+function update(){
+ const v=+vi.value,acc=+a.value,tm=+t.value,dx=v*tm+.5*acc*tm*tm,vel=v+acc*tm;
+ $('vio').textContent=v.toFixed(1)+' m/s';$('ao').textContent=acc.toFixed(1)+' m/s²';$('to').textContent=tm.toFixed(1)+' s';
+ $('result').textContent='변위 Δx = '+fmt(dx)+' m  ·  최종 속도 = '+fmt(vel)+' m/s';
+ const xs=Array.from({length:101},(_,i)=>v*i/10+.5*acc*(i/10)**2),vs=Array.from({length:101},(_,i)=>v+acc*i/10);
+ const pad=(arr)=>{let lo=Math.min(0,...arr),hi=Math.max(0,...arr);if(hi-lo<2){lo-=1;hi+=1}let p=(hi-lo)*.12;return [lo-p,hi+p]};
+ graph('gx',x=>v*x+.5*acc*x*x,pad(xs));graph('gv',x=>v+acc*x,pad(vs));graph('ga',()=>acc,[-4.8,4.8],'#12a150',true);
+}
+[vi,a,t].forEach(el=>el.addEventListener('input',()=>{stop();shown=+t.value;update()}));
+function stop(){if(timer){clearInterval(timer);timer=null}$('play').textContent='시간 애니메이션 ▶'}
+$('play').addEventListener('click',()=>{if(timer){stop();return}shown=0;$('play').textContent='일시정지 ❚❚';timer=setInterval(()=>{shown+=.1;if(shown>=+t.value){shown=+t.value;stop()}update()},40)});
+$('reset').addEventListener('click',()=>{stop();vi.value=2;a.value=1;t.value=5;shown=5;update()});
+shown=5;update();
+</script></body></html>
